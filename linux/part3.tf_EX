@@ -1,0 +1,55 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.21"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-2"
+}
+
+resource "aws_security_group" "allow_SSH" {
+  name = "allow_SSH"
+  description = "Allow SSH incoming, everything outgoing"
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+variable "ami" {
+  default = "ami-02d1e544b84bf7502"
+}
+
+variable "instance" {
+  default = "t2.micro"
+}
+
+resource "aws_key_pair" "key" {
+  key_name = "course_key"
+  public_key = file("course_key.pub")
+}
+
+resource "aws_instance" "linux" {
+  ami = var.ami
+  instance_type = var.instance
+  key_name = aws_key_pair.key.key_name
+  vpc_security_group_ids = [aws_security_group.allow_SSH.id]
+}
+
+output "ip_address" {
+  value = aws_instance.linux.public_ip
+}
