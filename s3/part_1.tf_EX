@@ -1,0 +1,16 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.21"
+    }
+  }
+}
+
+variable "bucket" {
+  default = "website-test-CHANGE"
+}
+
+resource "aws_s3_bucket" "website_test" {
+  bucket = var.bucket
+}
