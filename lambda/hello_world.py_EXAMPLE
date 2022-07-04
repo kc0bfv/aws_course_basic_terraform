@@ -1,0 +1,19 @@
+def hello_world(event, context):
+    return_text = ""
+    if "queryStringParameters" not in event:
+        return_text = "No query string present"
+    else:
+        query = event["queryStringParameters"]
+        if "num1" not in query:
+            return_text = "No num1 query"
+        elif "num2" not in query:
+            return_text = "No num2 query"
+        else:
+            num1 = int(query["num1"])
+            num2 = int(query["num2"])
+            return_text = f"Your numbers add to: {num1 + num2}"
+    return {
+        'statusCode': 200,
+        'body': f'<html><body>{return_text}</body></html>',
+        'headers': { 'Content-Type': "text/html" }
+    }
